@@ -6,6 +6,7 @@ import os
 import cv2
 import supervision as sv
 import numpy as np
+import pandas as pd
 from utils import load_video
 
 HOME = os.getcwd()
@@ -44,6 +45,14 @@ class SAMGenerator():
         '''
         # Load the image
         image_bgr = cv2.imread(self.IMAGE_PATH)
+        # save as txt
+        # np.savetxt("image_bgr.txt", image_bgr)
+        print(image_bgr)
+        
+        # save image_bgr matrix as txt  file
+        # np.savetxt("image_bgr.txt", image_bgr)
+        with open("image_bgr.txt", "w") as f:
+            f.write(str(image_bgr))
         image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
         
         # Generate the masks
@@ -110,6 +119,9 @@ class SAMGenerator():
 
     def video_predict(self, source, points_per_side, points_per_batch, min_mask_region_area, stability_score_thresh, pred_iou_thresh, stability_score_offset,
                       box_nms_thresh, crop_nms_thresh, crop_overlap_ratio, crop_n_points_downscale_factor, output_path="output.avi"):
+        centroids = pd.DataFrame(columns=['Batch', 'Mask', 'Centroid X', 'Centroid Y'])
+        batch_num = 0
+        
         cap, out = load_video(source, output_path)
         length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         colors = np.random.randint(0, 255, size=(256, 3), dtype=np.uint8)
@@ -153,15 +165,20 @@ class SAMGenerator():
                     continue
                 cx = int(moments["m10"] / moments["m00"])
                 cy = int(moments["m01"] / moments["m00"])
+                
                 # do something with centroid, such as print it out
-                print(f"Centroid of mask {i}: ({cx}, {cy})")
+                centroids.loc[len(centroids)] = [batch_num, i, cx, cy]
+                cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
+                cv2.putText(frame, f"({cx}, {cy})", (cx-30, cy-15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
+            batch_num += 1
             combined_mask = cv2.add(frame, mask_image)
             out.write(combined_mask)
 
         out.release()
         cap.release()
         cv2.destroyAllWindows()
+        centroids.to_excel('centroids_final.xlsx', index=False)
         
         return output_path
 

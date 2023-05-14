@@ -10,7 +10,7 @@ if __name__ == "__main__":
         source="output/particles/video.avi",
         points_per_side=14, 
         points_per_batch=64,
-        min_mask_region_area=1000,
+        min_mask_region_area=30,
         output_path="output.avi",
         pred_iou_thresh=0.88,
         stability_score_thresh=0.95,
