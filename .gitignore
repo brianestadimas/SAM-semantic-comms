@@ -1,6 +1,2 @@
 # exclude everything
 weights/*
-
-# exception to the rule
-!weights/.gitkeep 
-
