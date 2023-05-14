@@ -108,7 +108,8 @@ class SAMGenerator():
             titles=['source image', 'segmented image']
         )
 
-    def video_predict(self, source, points_per_side, points_per_batch, min_area, output_path="output.avi"):
+    def video_predict(self, source, points_per_side, points_per_batch, min_mask_region_area, stability_score_thresh, pred_iou_thresh, stability_score_offset,
+                      box_nms_thresh, crop_nms_thresh, crop_overlap_ratio, crop_n_points_downscale_factor, output_path="output.avi"):
         cap, out = load_video(source, output_path)
         length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         colors = np.random.randint(0, 255, size=(256, 3), dtype=np.uint8)
@@ -120,10 +121,13 @@ class SAMGenerator():
 
             model = sam
             mask_generator = SamAutomaticMaskGenerator(
-                model, points_per_side=points_per_side, points_per_batch=points_per_batch, min_mask_region_area=min_area
+                model, points_per_side=points_per_side, points_per_batch=points_per_batch, 
+                stability_score_thresh=stability_score_thresh, pred_iou_thresh=pred_iou_thresh, min_mask_region_area=min_mask_region_area,
+                box_nms_thresh=box_nms_thresh, crop_nms_thresh=crop_nms_thresh, crop_overlap_ratio=crop_overlap_ratio, 
+                crop_n_points_downscale_factor=crop_n_points_downscale_factor, stability_score_offset = stability_score_offset
             )
             masks = mask_generator.generate(frame)
-
+        
             if len(masks) == 0:
                 continue
 
@@ -160,5 +164,4 @@ class SAMGenerator():
         cv2.destroyAllWindows()
         
         return output_path
-
 

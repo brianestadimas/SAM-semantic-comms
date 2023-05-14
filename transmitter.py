@@ -8,8 +8,15 @@ if __name__ == "__main__":
     
     results = sam_generator.video_predict(
         source="output/particles/video.avi",
-        points_per_side=16, 
+        points_per_side=14, 
         points_per_batch=64,
-        min_area=100,
+        min_mask_region_area=1000,
         output_path="output.avi",
+        pred_iou_thresh=0.88,
+        stability_score_thresh=0.95,
+        stability_score_offset=1,
+        box_nms_thresh=0.7,
+        crop_nms_thresh=0.7,
+        crop_overlap_ratio=0.3413333333333333,
+        crop_n_points_downscale_factor=1,
     )
