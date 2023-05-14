@@ -142,6 +142,15 @@ class SAMGenerator():
                 img = cv2.bitwise_and(img, img, mask=m.astype(np.uint8))
                 img = cv2.addWeighted(img, 0.35, np.zeros_like(img), 0.65, 0)
                 mask_image = cv2.add(mask_image, img)
+                
+                # calculate centroid of mask
+                moments = cv2.moments(m.astype(np.uint8))
+                if moments["m00"] == 0:
+                    continue
+                cx = int(moments["m10"] / moments["m00"])
+                cy = int(moments["m01"] / moments["m00"])
+                # do something with centroid, such as print it out
+                print(f"Centroid of mask {i}: ({cx}, {cy})")
 
             combined_mask = cv2.add(frame, mask_image)
             out.write(combined_mask)
