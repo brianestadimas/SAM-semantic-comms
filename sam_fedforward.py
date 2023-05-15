@@ -32,7 +32,7 @@ class SAMGenerator():
         self.IMAGE_NAME = image_name
         self.IMAGE_PATH = os.path.join(HOME, "data", image_name)
 
-    def get_masks_annotator(self):
+    def get_masks_annotator(self, visualize=True):
         '''
         SamAutomaticMaskGenerator returns a list of masks, where each mask is a dict containing various information about the mask:
         segmentation - [np.ndarray] - the mask with (W, H) shape, and bool type
@@ -45,14 +45,11 @@ class SAMGenerator():
         '''
         # Load the image
         image_bgr = cv2.imread(self.IMAGE_PATH)
-        # save as txt
-        # np.savetxt("image_bgr.txt", image_bgr)
-        print(image_bgr)
         
-        # save image_bgr matrix as txt  file
-        # np.savetxt("image_bgr.txt", image_bgr)
-        with open("image_bgr.txt", "w") as f:
-            f.write(str(image_bgr))
+        # # save image_bgr matrix as txt  file
+        # # np.savetxt("image_bgr.txt", image_bgr)
+        # with open("image_bgr.txt", "w") as f:
+        #     f.write(str(image_bgr))
         image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
         
         # Generate the masks
@@ -61,15 +58,18 @@ class SAMGenerator():
 
         # print(sam_result[0].keys())
         # Visualize the mask with supervision
-        mask_annotator = sv.MaskAnnotator()
-        detections = sv.Detections.from_sam(sam_result=sam_result)
-        annotated_image = mask_annotator.annotate(scene=image_bgr.copy(), detections=detections)
-        sv.plot_images_grid(
-            images=[image_bgr, annotated_image],
-            grid_size=(1, 2),
-            titles=['source image', 'segmented image']
-        )
-    
+        if visualize:
+            mask_annotator = sv.MaskAnnotator()
+            detections = sv.Detections.from_sam(sam_result=sam_result)
+            annotated_image = mask_annotator.annotate(scene=image_bgr.copy(), detections=detections)
+            sv.plot_images_grid(
+                images=[image_bgr, annotated_image],
+                grid_size=(1, 2),
+                titles=['source image', 'segmented image']
+            )
+        
+        return sam_result, image_bgr
+                
     def get_box_prompter(self, x = 68, y = 247, width = 555, height = 678, label = ''):
         '''
         SamAutomaticBoxGenerator returns a list of boxes, where each box is a dict containing various information about the box:

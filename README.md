@@ -21,7 +21,7 @@ To predict particles in a video, please follow the below steps:
 
 2. Place the input video file `video.avi` into the `output/files` directory.
 3. Run the following command in the terminal to start the transmitter:
-`python transmitter.py`
+`python video_transmitter.py`
 
 ## Utilities
 
