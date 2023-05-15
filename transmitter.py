@@ -1,6 +1,6 @@
-from semantic_extractor import SemanticExtractor
+from semantic_extractor import SemanticBased
 
 if __name__ == "__main__":
     # Semantic Extraction for masks and foreground
-    semantic_images = SemanticExtractor(image_name="catdog.jpg")
-    semantic_images.output_semantic(color_image=True)
+    semantic_images = SemanticBased(image_name="catdog.jpg")
+    semantic_images.extract_images(color_image=True)
