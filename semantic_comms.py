@@ -2,66 +2,9 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
-
-# Set random seed for reproducibility
-torch.manual_seed(42)
-np.random.seed(42)
-
-
-# Define semantic encoder and decoder models
-class SemanticEncoder(nn.Module):
-    def __init__(self):
-        super(SemanticEncoder, self).__init__()
-
-        # Define encoder architecture
-        self.conv1 = nn.Conv2d(in_channels=3, out_channels=32, kernel_size=3, padding=1)
-        self.relu1 = nn.ReLU()
-        self.batchnorm1 = nn.BatchNorm2d(32)
-        self.maxpool1 = nn.MaxPool2d(kernel_size=2)
-
-        self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, padding=1)
-        self.relu2 = nn.ReLU()
-        self.batchnorm2 = nn.BatchNorm2d(64)
-        self.maxpool2 = nn.MaxPool2d(kernel_size=2)
-
-    def forward(self, x):
-        # Perform encoding
-        x = self.conv1(x)
-        x = self.relu1(x)
-        x = self.batchnorm1(x)
-        x = self.maxpool1(x)
-
-        x = self.conv2(x)
-        x = self.relu2(x)
-        x = self.batchnorm2(x)
-        x = self.maxpool2(x)
-
-        return x
-
-class SemanticDecoder(nn.Module):
-    def __init__(self):
-        super(SemanticDecoder, self).__init__()
-
-        # Define decoder architecture
-        self.deconv1 = nn.ConvTranspose2d(in_channels=64, out_channels=32, kernel_size=3, stride=2, padding=1, output_padding=1)
-        self.relu1 = nn.ReLU()
-        self.batchnorm1 = nn.BatchNorm2d(32)
-
-        self.deconv2 = nn.ConvTranspose2d(in_channels=32, out_channels=3, kernel_size=3, stride=2, padding=1, output_padding=1)
-        self.relu2 = nn.ReLU()
-        self.batchnorm2 = nn.BatchNorm2d(3)
-
-    def forward(self, x):
-        # Perform decoding
-        x = self.deconv1(x)
-        x = self.relu1(x)
-        x = self.batchnorm1(x)
-
-        x = self.deconv2(x)
-        x = self.relu2(x)
-        x = self.batchnorm2(x)
-
-        return x
+import os
+from PIL import Image
+import torchvision.transforms as transforms
 
 
 # Define AWGN channel
@@ -76,13 +19,12 @@ def add_awgn_noise(signal, snr):
 
 
 # Define training loop
-def train_semantic_communication_system(images, snr, num_epochs):
-    encoder = SemanticEncoder()
-    decoder = SemanticDecoder()
-
+def train_semantic_communication_system(encoder_model, decoder_model, images, snr, num_epochs):
+    encoder = encoder_model
+    decoder = decoder_model
     # Define loss function and optimizer
     criterion = nn.MSELoss()
-    optimizer = optim.Adam(list(encoder.parameters()) + list(decoder.parameters()), lr=0.001)
+    optimizer = optim.Adam(list(encoder.parameters()) + list(decoder.parameters()), lr=0.01)
 
     for epoch in range(num_epochs):
         optimizer.zero_grad()
@@ -91,10 +33,10 @@ def train_semantic_communication_system(images, snr, num_epochs):
         encoded_images = encoder(images)
 
         # Compression (optional)
-        compressed_images = torch.flatten(encoded_images, start_dim=1)
+        # compressed_images = torch.flatten(encoded_images, start_dim=1)
 
         # Transmission over AWGN channel
-        noisy_images = add_awgn_noise(compressed_images, snr)
+        noisy_images = add_awgn_noise(encoded_images, snr)
 
         # Data restoration
         restored_images = decoder(noisy_images)
@@ -115,33 +57,27 @@ def train_semantic_communication_system(images, snr, num_epochs):
     return encoder, decoder
 
 
-# Calculate SNR
-def calculate_snr(original_signal, noisy_signal):
-    signal_power = torch.mean(torch.square(original_signal))
-    noise_power = torch.mean(torch.square(original_signal - noisy_signal))
+# Calculate PSNR
+def calculate_psnr(original_signal, roi_signal, roni_signal, theta=1.0):
+    mse_roi = torch.mean(torch.square(original_signal - roi_signal))
+    print(original_signal)
+    mse_roni = torch.mean(torch.square(original_signal - roni_signal))
+    
+    signal_power = torch.square(torch.max(original_signal))
+    noise_power = mse_roi * theta # + mse_roni * (1 - theta)
     snr = 10 * torch.log10(signal_power / noise_power)
     return snr
 
-# Example usage
-
-# Images
-num_images = images.size(0)
-image_channels = images.size(1)
-image_height = images.size(2)
-image_width = images.size(3)
-
-# Reshape images tensor to fit the semantic encoder input shape
-images = images.view(num_images, image_channels, image_height, image_width)
-
-# Set the desired SNR and number of training epochs
-snr = 20  # dB
-num_epochs = 100
-
-# Train the semantic communication system
-encoder, decoder = train_semantic_communication_system(images, snr, num_epochs)
-
-# Calculate SNR
-restored_images = decoder(encoder(images))
-snr = calculate_snr(images, restored_images)
-
-print(f"SNR over AWGN channel: {snr.item()} dB")
+# Load Images
+def load_images(folder_path):
+    target_size = (512, 512)
+    image_list = []
+    for filename in os.listdir(folder_path):
+        if filename.endswith(".jpg") or filename.endswith(".png"):
+            image_path = os.path.join(folder_path, filename)
+            image = Image.open(image_path).convert("RGB")
+            image = image.resize(target_size)  # Resize image to target size
+            image = transforms.ToTensor()(image)
+            image_list.append(image)
+    images = torch.stack(image_list)
+    return images
