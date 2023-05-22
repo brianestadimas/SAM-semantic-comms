@@ -60,7 +60,6 @@ def train_semantic_communication_system(encoder_model, decoder_model, images, sn
 # Calculate PSNR
 def calculate_psnr(original_signal, roi_signal, roni_signal, theta=1.0):
     mse_roi = torch.mean(torch.square(original_signal - roi_signal))
-    print(original_signal)
     mse_roni = torch.mean(torch.square(original_signal - roni_signal))
     
     signal_power = torch.square(torch.max(original_signal))

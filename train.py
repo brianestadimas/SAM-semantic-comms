@@ -13,7 +13,7 @@ if __name__ == "__main__":
     np.random.seed(42)
 
     # Images
-    images = load_images("output/masks")
+    images = load_images("output/tc_ori")
     num_images = images.size(0)
     image_channels = images.size(1)
     image_height = images.size(2)
@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
     # Set the desired SNR and number of training epochs
     snr = 20  # dB
-    num_epochs = 1500
+    num_epochs = 100
 
     # Train the semantic communication system
     encoder_model = SemanticEncoder1()
@@ -45,19 +45,3 @@ if __name__ == "__main__":
 
     print(f"PSNR over AWGN channel: {snr.item()} dB")
     
-    # Plot the original and restored images
-    original_image = images[0].permute(1, 2, 0)
-    restored_image = restored_images[0].detach().cpu().permute(1, 2, 0)
-
-    fig, axes = plt.subplots(1, 2, figsize=(10, 5))
-
-    axes[0].imshow(original_image)
-    axes[0].set_title("Original Image")
-    axes[0].axis("off")
-
-    axes[1].imshow(restored_image)
-    axes[1].set_title("Restored Image")
-    axes[1].axis("off")
-
-    plt.tight_layout()
-    plt.show()
