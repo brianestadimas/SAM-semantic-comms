@@ -1,4 +1,4 @@
-from semantic_comms import calculate_psnr, train_semantic_communication_system, load_images
+from semantic_comms import calculate_psnr, train_semantic_communication_system, load_images, add_awgn_noise
 import torch
 import numpy as np
 from semantic_models.sc1 import SemanticEncoder1, SemanticDecoder1
@@ -13,7 +13,7 @@ if __name__ == "__main__":
     np.random.seed(42)
 
     # Images
-    images = load_images("output/tc_ori")
+    images = load_images("output/masks")
     num_images = images.size(0)
     image_channels = images.size(1)
     image_height = images.size(2)
@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
     # Set the desired SNR and number of training epochs
     snr = 20  # dB
-    num_epochs = 100
+    num_epochs = 500
 
     # Train the semantic communication system
     encoder_model = SemanticEncoder1()
@@ -39,8 +39,11 @@ if __name__ == "__main__":
     encoder, decoder = train_semantic_communication_system(encoder_model, decoder_model, images, snr, num_epochs)
 
     # Calculate SNR
-    restored_images = decoder(encoder(images))
+    encoder_images = encoder(images)
+    noisy_images = add_awgn_noise(encoder_images, snr)
+    restored_images = decoder(noisy_images)
     theta = 1.0
+    
     snr = calculate_psnr(images, restored_images, restored_images, theta)
 
     print(f"PSNR over AWGN channel: {snr.item()} dB")
