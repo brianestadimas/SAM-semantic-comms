@@ -13,7 +13,7 @@ if __name__ == "__main__":
     np.random.seed(42)
 
     # Images
-    images = load_images("output/masks")
+    images = load_images("output/tc_ori")
     num_images = images.size(0)
     image_channels = images.size(1)
     image_height = images.size(2)
@@ -23,8 +23,8 @@ if __name__ == "__main__":
     images = images.view(num_images, image_channels, image_height, image_width)
 
     # Set the desired SNR and number of training epochs
-    snr = 20  # dB
-    num_epochs = 500
+    snr = 4  # dB
+    num_epochs = 100
 
     # Train the semantic communication system
     encoder_model = SemanticEncoder1()
@@ -46,5 +46,9 @@ if __name__ == "__main__":
     
     snr = calculate_psnr(images, restored_images, restored_images, theta)
 
+
+    print(images.shape)
+    print(encoder_images.shape)
+    print(restored_images.shape)
     print(f"PSNR over AWGN channel: {snr.item()} dB")
     

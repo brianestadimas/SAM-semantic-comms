@@ -5,6 +5,7 @@ import numpy as np
 import os
 from PIL import Image
 import torchvision.transforms as transforms
+from torchsummary import summary
 
 
 # Define AWGN channel
