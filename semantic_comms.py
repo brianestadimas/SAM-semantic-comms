@@ -5,7 +5,7 @@ import numpy as np
 import os
 from PIL import Image
 import torchvision.transforms as transforms
-from torchsummary import summary
+import torch.nn.functional as F
 
 
 # Define AWGN channel
@@ -35,6 +35,12 @@ def train_semantic_communication_system(encoder_model, decoder_model, images, sn
 
         # Compression (optional)
         # compressed_images = torch.flatten(encoded_images, start_dim=1)
+        # compression_rate = 0.9
+        # compressed_images = encoded_images.clone()
+        # image_height, image_width = compressed_images.size(2), compressed_images.size(3)
+        # roi_height = int(image_height * compression_rate)
+        # roi_width = int(image_width * compression_rate)
+        # compressed_images[:, :, :roi_height, :roi_width] = 0
 
         # Transmission over AWGN channel
         # noisy_images = add_awgn_noise(encoded_images, snr)
