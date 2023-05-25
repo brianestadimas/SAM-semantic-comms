@@ -31,8 +31,6 @@ class SAMGenerator():
     def __init__(self, image_name):
         self.IMAGE_NAME = image_name
         self.IMAGE_PATH = os.path.join(HOME, "data", image_name)
-
-    def get_masks_annotator(self, visualize=True):
         '''
         SamAutomaticMaskGenerator returns a list of masks, where each mask is a dict containing various information about the mask:
         segmentation - [np.ndarray] - the mask with (W, H) shape, and bool type
@@ -43,6 +41,8 @@ class SAMGenerator():
         stability_score - [float] - an additional measure of mask quality
         crop_box - List[int] - the crop of the image used to generate this mask in xywh format
         '''
+
+    def get_masks_annotator(self, visualize=True):
         # Load the image
         image_bgr = cv2.imread(self.IMAGE_PATH)
         
@@ -53,7 +53,17 @@ class SAMGenerator():
         image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
         
         # Generate the masks
-        mask_generator = SamAutomaticMaskGenerator(sam)
+        mask_generator = SamAutomaticMaskGenerator(model=sam,
+                                                #    points_per_side=14, 
+                                                #    points_per_batch=64,
+                                                #    min_mask_region_area=200,
+                                                #    pred_iou_thresh=0.9,
+                                                #    stability_score_thresh=0.97,
+                                                #    stability_score_offset=1,
+                                                #    box_nms_thresh=0.7,
+                                                #    crop_nms_thresh=0.7,
+                                                #    crop_overlap_ratio=0.3413333333333333,
+                                                   crop_n_points_downscale_factor=1)
         sam_result = mask_generator.generate(image_rgb)
 
         # print(sam_result[0].keys())

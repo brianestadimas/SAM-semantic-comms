@@ -12,6 +12,19 @@ class SemanticBased():
     
     def extract_images(self, color_image=False):
         sam_result, image_bgr = self.sam_gen.get_masks_annotator(visualize=False)
+        
+        background_mask = np.ones_like(image_bgr, dtype=bool)
+        for detection in sam_result:
+            mask = detection["segmentation"]
+            background_mask[mask] = False
+        background_image = np.zeros_like(image_bgr)
+        background_image[background_mask] = image_bgr[background_mask]
+        if color_image:
+            cv2.imwrite(f"{DEFAULT_PATH}/background.png", background_image)
+        else:
+            background_image_gray = cv2.cvtColor(background_image, cv2.COLOR_BGR2GRAY)
+            cv2.imwrite(f"{DEFAULT_PATH}/background.png", background_image_gray)
+    
         # Loop through the sam_result dictionary and save each mask as a separate image
         for i, detection in enumerate(sam_result):
             mask = detection["segmentation"]
