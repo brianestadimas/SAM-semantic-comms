@@ -43,10 +43,10 @@ def train_semantic_communication_system(encoder_model, decoder_model, images, sn
         # compressed_images[:, :, :roi_height, :roi_width] = 0
 
         # Transmission over AWGN channel
-        # noisy_images = add_awgn_noise(encoded_images, snr)
+        noisy_images = add_awgn_noise(encoded_images, snr)
 
         # Data restoration
-        restored_images = decoder(encoded_images)
+        restored_images = decoder(noisy_images)
 
         # Semantic decoding
 
@@ -76,13 +76,13 @@ def calculate_psnr(original_signal, roi_signal, roni_signal, theta=1.0):
 
 # Load Images
 def load_images(folder_path):
-    target_size = (512, 512)
+    # target_size = (512, 512)
     image_list = []
     for filename in os.listdir(folder_path):
         if filename.endswith(".jpg") or filename.endswith(".png"):
             image_path = os.path.join(folder_path, filename)
             image = Image.open(image_path).convert("RGB")
-            image = image.resize(target_size)  # Resize image to target size
+            # image = image.resize(target_size)  # Resize image to target size
             image = transforms.ToTensor()(image)
             image_list.append(image)
     images = torch.stack(image_list)
