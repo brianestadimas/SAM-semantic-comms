@@ -23,8 +23,8 @@ if __name__ == "__main__":
     images = images.view(num_images, image_channels, image_height, image_width)
 
     # Set the desired SNR and number of training epochs
-    snr = 10  # dB
-    num_epochs = 500
+    snr = 13  # dB
+    num_epochs = 1500
 
     # Train the semantic communication system
     encoder_model = SemanticEncoder()
