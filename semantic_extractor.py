@@ -1,4 +1,5 @@
 from sam_fedforward import SAMGenerator
+from utils import empty_folder
 import os
 import cv2
 import numpy as np
@@ -6,11 +7,13 @@ import numpy as np
 DEFAULT_PATH = "output/masks"
 
 class SemanticBased():
-    def __init__(self, image_name):
-        self.sam_gen = SAMGenerator(image_name)
+    def __init__(self, image_name, image_path=None):
+        self.sam_gen = SAMGenerator(image_name, image_path)
         self.image_name = image_name
+        self.image_path = image_path
     
     def extract_images(self, color_image=False):
+        empty_folder(DEFAULT_PATH)
         sam_result, image_bgr = self.sam_gen.get_masks_annotator(visualize=False)
         
         background_mask = np.ones_like(image_bgr, dtype=bool)
@@ -36,6 +39,3 @@ class SemanticBased():
             else:
                 mask_image_gray = cv2.cvtColor(mask_image, cv2.COLOR_BGR2GRAY)  # Convert the mask image to grayscale
                 cv2.imwrite(f"{DEFAULT_PATH}/mask_{i}.png", mask_image_gray)   
- 
-    def semantic_extractor(self):
-        return

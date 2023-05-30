@@ -28,9 +28,9 @@ def encode_image(filepath):
 
 # Automatic Mask Generator
 class SAMGenerator():
-    def __init__(self, image_name):
+    def __init__(self, image_name, image_path):
         self.IMAGE_NAME = image_name
-        self.IMAGE_PATH = os.path.join(HOME, "data", image_name)
+        self.IMAGE_PATH = os.path.join(HOME, "data", image_name) if not image_path else image_path
         '''
         SamAutomaticMaskGenerator returns a list of masks, where each mask is a dict containing various information about the mask:
         segmentation - [np.ndarray] - the mask with (W, H) shape, and bool type

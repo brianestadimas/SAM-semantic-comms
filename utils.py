@@ -27,3 +27,12 @@ def load_video(video_path, output_path="output.avi"):
     out = cv2.VideoWriter(output_path, fourcc, fps, (frame_width, frame_height))
 
     return cap, out
+
+def empty_folder(folder_path):
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+        elif os.path.isdir(file_path):
+            empty_folder(file_path)
+            os.rmdir(file_path)
