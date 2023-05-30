@@ -33,15 +33,6 @@ def train_semantic_communication_system(encoder_model, decoder_model, images, sn
         # Semantic encoding
         encoded_images = encoder(images)
 
-        # Compression (optional)
-        # compressed_images = torch.flatten(encoded_images, start_dim=1)
-        # compression_rate = 0.9
-        # compressed_images = encoded_images.clone()
-        # image_height, image_width = compressed_images.size(2), compressed_images.size(3)
-        # roi_height = int(image_height * compression_rate)
-        # roi_width = int(image_width * compression_rate)
-        # compressed_images[:, :, :roi_height, :roi_width] = 0
-
         # Transmission over AWGN channel
         #noisy_images = add_awgn_noise(encoded_images, snr)
 
@@ -65,12 +56,11 @@ def train_semantic_communication_system(encoder_model, decoder_model, images, sn
 
 
 # Calculate PSNR
-def calculate_psnr(original_signal, roi_signal, roni_signal, theta=1.0):
-    mse_roi = torch.mean(torch.square(original_signal - roi_signal))
-    mse_roni = torch.mean(torch.square(original_signal - roni_signal))
+def calculate_psnr(original_signal, roi_signal, theta=1.0):
+    mse = torch.mean(torch.square(original_signal - roi_signal))
     
     signal_power = torch.square(torch.max(original_signal))
-    noise_power = mse_roi * theta # + mse_roni * (1 - theta)
+    noise_power = mse * theta # + mse_roni * (1 - theta)
     snr = 10 * torch.log10(signal_power / noise_power)
     return snr
 

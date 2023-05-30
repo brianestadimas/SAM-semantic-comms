@@ -29,12 +29,6 @@ if __name__ == "__main__":
     # Train the semantic communication system
     encoder_model = SemanticEncoder()
     decoder_model = SemanticDecoder()
-    
-    # encoder_model = SemanticEncoder2()
-    # decoder_model = SemanticDecoder2()
-    
-    # encoder_model = SemanticEncoderTC()
-    # decoder_model = SemanticDecoderTC()
 
     encoder, decoder = train_semantic_communication_system(encoder_model, decoder_model, images, snr, num_epochs)
 
@@ -44,7 +38,7 @@ if __name__ == "__main__":
     restored_images = decoder(encoder_images)
     theta = 1.0
     
-    snr = calculate_psnr(images, restored_images, restored_images, theta)
+    snr = calculate_psnr(images, restored_images, theta)
 
 
     print(images.shape)
