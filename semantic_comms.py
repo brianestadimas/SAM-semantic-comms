@@ -43,10 +43,10 @@ def train_semantic_communication_system(encoder_model, decoder_model, images, sn
         # compressed_images[:, :, :roi_height, :roi_width] = 0
 
         # Transmission over AWGN channel
-        noisy_images = add_awgn_noise(encoded_images, snr)
+        #noisy_images = add_awgn_noise(encoded_images, snr)
 
         # Data restoration
-        restored_images = decoder(noisy_images)
+        restored_images = decoder(encoded_images)
 
         # Semantic decoding
 
