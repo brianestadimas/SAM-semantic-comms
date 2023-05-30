@@ -4,6 +4,7 @@ import numpy as np
 from semantic_models.sc1 import SemanticEncoder, SemanticDecoder
 from semantic_models.sc2 import SemanticEncoder2, SemanticDecoder2
 from semantic_models.tc import SemanticEncoderTC, SemanticDecoderTC
+from semantic_models.vit import SemanticEncoderVIT, SemanticDecoderVIT
 import matplotlib.pyplot as plt
 
 
@@ -29,8 +30,11 @@ if __name__ == "__main__":
     # Train the semantic communication system
     encoder_model = SemanticEncoder()
     decoder_model = SemanticDecoder()
+    
+    encoder_model_vit = SemanticEncoderVIT()
+    decoder_model_vit = SemanticDecoderVIT()
 
-    encoder, decoder = train_semantic_communication_system(encoder_model, decoder_model, images, snr, num_epochs)
+    encoder, decoder = train_semantic_communication_system(encoder_model_vit, decoder_model_vit, images, snr, num_epochs)
 
     # Calculate SNR
     encoder_images = encoder(images)
