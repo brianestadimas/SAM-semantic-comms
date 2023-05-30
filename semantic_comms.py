@@ -19,6 +19,10 @@ def add_awgn_noise(signal, snr):
     return noisy_signal
 
 
+def calculate_compression_rate(original_size, compressed_size):
+    return compressed_size / original_size
+
+
 # Define training loop
 def train_semantic_communication_system(encoder_model, decoder_model, images, snr, num_epochs):
     encoder = encoder_model
